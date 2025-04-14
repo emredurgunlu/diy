@@ -1,7 +1,7 @@
-import Image from "next/image";
+import HomeSwiper from "@/components/home-swiper";
 
 export default function Home() {
   return (
-<div></div>
+    <HomeSwiper />
   );
 }
