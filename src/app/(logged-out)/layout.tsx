@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "../../../auth";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 
 //  Bu kısım protected route için. Yani user log in olmuşsa ve browserdan /login veya /register sayfasına gitmeye çalışıyorsa bu sayfalar yerine zaten log in olduğu için /my-account sayfasına yönlendirecek
@@ -32,5 +34,14 @@ export default async function LoggedOutLayout({
     redirect("/my-account");
   }
 
-  return children;
+  return (
+    <div>
+      <div className="fixed top-4 right-20 z-3">
+        <Link href="/login">
+          <Button>Login</Button>
+        </Link>
+      </div>
+      {children}
+    </div>
+  );
 }

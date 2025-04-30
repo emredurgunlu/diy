@@ -25,6 +25,8 @@ import { z } from "zod";
 import { loginWithCredentials } from "./action";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useState } from "react";
+import AuthOptions from "../auth-options";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -33,6 +35,7 @@ const formSchema = z.object({
 
 export default function Login() {
   const router = useRouter();
+  const [showForm, setShowForm] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -64,7 +67,6 @@ export default function Login() {
   const email = form.watch("email");
 
   return (
-
     <main className="flex justify-center items-center min-h-screen">
       <Card className="w-[350px]">
         <CardHeader>
@@ -72,52 +74,56 @@ export default function Login() {
           <CardDescription>Log in to your account.</CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(handleSubmit)}
-              className="flex flex-col gap-2"
-            >
-              <fieldset
-                disabled={form.formState.isSubmitting}
+          {!showForm ? (
+            <AuthOptions onEmail={() => setShowForm(true)} />
+          ) : (
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(handleSubmit)}
                 className="flex flex-col gap-2"
               >
-                {/*fieldset kısmı kullanıcının register butonuna bastığı zaman formun submit edildiğini farketmesi için bir loading state göstermek amaçlı */}
-                {/*yani form submit edilirken bu field sete disabled özelliği ekleyeceğiz */}
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="email" />
-                      </FormControl>
-                      <FormMessage></FormMessage>
-                    </FormItem>
+                <fieldset
+                  disabled={form.formState.isSubmitting}
+                  className="flex flex-col gap-2"
+                >
+                  {/*fieldset kısmı kullanıcının register butonuna bastığı zaman formun submit edildiğini farketmesi için bir loading state göstermek amaçlı */}
+                  {/*yani form submit edilirken bu field sete disabled özelliği ekleyeceğiz */}
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input {...field} type="email" />
+                        </FormControl>
+                        <FormMessage></FormMessage>
+                      </FormItem>
+                    )}
+                  ></FormField>
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input {...field} type="password" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  ></FormField>
+                  {!!form.formState.errors.root?.message && (
+                    <FormMessage>
+                      {form.formState.errors.root.message}
+                    </FormMessage>
                   )}
-                ></FormField>
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="password" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                ></FormField>
-                {!!form.formState.errors.root?.message && (
-                  <FormMessage>
-                    {form.formState.errors.root.message}
-                  </FormMessage>
-                )}
-                <Button type="submit">Login</Button>
-              </fieldset>
-            </form>
-          </Form>
+                  <Button type="submit">Login</Button>
+                </fieldset>
+              </form>
+            </Form>
+          )}
         </CardContent>
         <CardFooter className="flex-col gap-2">
           <div className="text-muted-foreground text-sm">
