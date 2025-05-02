@@ -19,7 +19,7 @@ interface AuthOptionsProps {
 export default function AuthOptions({ onEmail }: AuthOptionsProps) {
   return (
     <div className="flex flex-col gap-4 w-full max-w-xs mx-auto">
-      <Button variant="outline" className="flex items-center  gap-2 justify-center">
+      <Button variant="outline" className="flex items-center gap-2 justify-center">
         <GoogleIcon />
         <span>Continue with Google</span>
       </Button>
