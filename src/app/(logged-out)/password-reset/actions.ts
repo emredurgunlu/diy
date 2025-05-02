@@ -57,8 +57,8 @@ export const passwordReset = async (emailAddress: string) => {
     from: "test@resend.dev",
     subject: "Your password reset request",
     to: emailAddress,
-    html: `Hey, ${emailAddress}! You requested to reset your password.
-    Here's your password reset link. This link will expire in 1 hour:
+    html: `Hey, ${emailAddress}! You requested to reset your password.<br/>
+    Here's your password reset link. This link will expire in 1 hour:<br/>
     <a href="${resetLink}">${resetLink}</a>`,
   });
 
