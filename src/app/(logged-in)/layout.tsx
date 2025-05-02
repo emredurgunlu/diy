@@ -2,6 +2,8 @@ import Link from "next/link";
 import LogoutButton from "./logout-button";
 import { auth } from "../../../auth";
 import { redirect } from "next/navigation";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
 
 export default async function LoggedInLayout({
   children,
@@ -15,6 +17,10 @@ export default async function LoggedInLayout({
   }
 
   return (
+    <SidebarProvider>
+    <AppSidebar />
+    <main>
+      <SidebarTrigger />
     <div className="min-h-screen flex flex-col">
       <nav className="bg-gray-200 flex justify-between p-4 items-center">
         <ul className="flex gap-4">
@@ -31,5 +37,8 @@ export default async function LoggedInLayout({
       </nav>
       <div className="flex-1 flex justify-center items-center">{children}</div>
     </div>
+    </main>
+    </SidebarProvider>
+
   );
 }
