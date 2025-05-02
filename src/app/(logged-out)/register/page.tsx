@@ -50,13 +50,14 @@ export default function Register() {
         <main className="flex justify-center items-center min-h-screen">
             {form.formState.isSubmitSuccessful ? (
                 <Card className="w-[350px]">
-                    <CardHeader className="flex justify-center items-center text-center">
-                        <CardTitle>Your account has been created</CardTitle>
+                    <CardHeader className="flex justify-center items-center">
+                        <CardTitle>Check your email to verify your account</CardTitle>
                     </CardHeader>
                     <CardContent>
+                    We have sent a verification link to your email address. Please check your inbox and click the link to activate your account.
                         {/* child prop means all of the styles for the button is going to be applied to the link component */}
-                        <Button asChild className="w-full">
-                            <Link href="/login">Login to your account</Link>
+                        <Button asChild className="w-full mt-4">
+                            <Link href="/login">Back to Login</Link>
                         </Button>
                     </CardContent>
                 </Card>

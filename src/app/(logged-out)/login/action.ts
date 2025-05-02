@@ -3,6 +3,12 @@
 import { passwordSchema } from "@/validation/passwordSchema";
 import { z } from "zod";
 import { signIn } from "../../../../auth";
+import db from "@/db/drizzle";
+import { users } from "@/db/usersSchema";
+import { sendEmailVerification } from "@/lib/sendEmailVerification";
+import { eq } from "drizzle-orm";
+import { compare } from "bcryptjs";
+import { emailVerificationTokens } from "@/db/emailVerificationTokensSchema";
 
 export const loginWithCredentials = async ({
     email,
@@ -30,18 +36,40 @@ export const loginWithCredentials = async ({
             loginValidation.error?.issues[0]?.message ?? "An error occurred.",
         };
       }
+
+      // Kullanıcıyı bul
+      const [user] = await db.select().from(users).where(eq(users.email, email));
+      if (!user) {
+        return {
+          error: true,
+          message: "Incorrect email or password.",
+        };
+      }
+
+      // Doğrulama kontrolü
+      if (!user.isUserVerified) {
+        return {
+          error: true,
+          message: "Please verify your account before logging in.",
+        };
+      }
+
+      // Şifre kontrolü
+      const passwordCorrect = await compare(password, user.password!);
+      if (!passwordCorrect) {
+        return {
+          error: true,
+          message: "Incorrect email or password.",
+        };
+      }
+
+      // Giriş işlemi
       try {
-        await signIn("credentials",{
+        await signIn("credentials", {
           email,
           password,
           redirect: false,
-          // In here we want to set redirect equal to false.
-          // So we're going to manually redirect the user after a successful sign in.
-          // Now the reason for this is because if we have redirect set to true here redirects actually throw an
-          // error.
-          // And if we throw an error from a server action, it will seem like the server action actually failed.
-          // So we need to set in here redirect equal to false.
-        })
+        });
       } catch (e) {
         return {
           error: true,
@@ -49,3 +77,18 @@ export const loginWithCredentials = async ({
         };
       }
   }
+
+export const resendVerificationEmail = async (email: string) => {
+  if (!email) {
+    return { error: true, message: "Email is required." };
+  }
+  const [user] = await db.select().from(users).where(eq(users.email, email));
+  if (!user) {
+    return { error: true, message: "User not found." };
+  }
+  if (user.isUserVerified) {
+    return { error: true, message: "User is already verified." };
+  }
+  await sendEmailVerification(user.id, user.email as string);
+  return { success: true, message: "Verification email sent." };
+};

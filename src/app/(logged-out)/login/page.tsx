@@ -22,7 +22,7 @@ import { passwordSchema } from "@/validation/passwordSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { loginWithCredentials } from "./action";
+import { loginWithCredentials, resendVerificationEmail } from "./action";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
@@ -115,9 +115,21 @@ export default function Login() {
                     )}
                   ></FormField>
                   {!!form.formState.errors.root?.message && (
-                    <FormMessage>
-                      {form.formState.errors.root.message}
-                    </FormMessage>
+                    <>
+                      <FormMessage>
+                        {form.formState.errors.root.message}
+                      </FormMessage>
+                      {form.formState.errors.root.message === "Please verify your account before logging in." && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="mt-2"
+                          onClick={() => resendVerificationEmail(form.getValues("email"))}
+                        >
+                          Resend verification email
+                        </Button>
+                      )}
+                    </>
                   )}
                   <Button type="submit">Login</Button>
                 </fieldset>

@@ -64,9 +64,9 @@ export default function UpdatePasswordForm({ token }: Props) {
   return form.formState.isSubmitSuccessful ? (
     <div>
       You password has been updated.{" "}
-      <Link className="underline" href="/login">
-        Click here to login to your account
-      </Link>
+      <Button asChild className="w-full mt-4">
+                            <Link href="/login">Back to Login</Link>
+                        </Button>
     </div>
   ) : (
     <Form {...form}>
