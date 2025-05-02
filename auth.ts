@@ -4,11 +4,37 @@ import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials";
 import { eq } from "drizzle-orm";
 import { compare } from "bcryptjs";
+import GoogleProvider from "next-auth/providers/google";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
     // buradaki call back const session = await auth(); kısmındaki session bilgilerine id eklemek için bkz. logged-out layout.tsx
     callbacks: {
-        jwt({ token, user }) {
+        async jwt({ token, user, account, profile }) {
+          // Google ile giriş yapıldıysa
+          if (account?.provider === "google") {
+            // Google'dan gelen email
+            const email = profile?.email as string;
+            // Veritabanında kullanıcıyı ara
+            let [dbUser] = await db.select().from(users).where(eq(users.email, email));
+            // Eğer kullanıcı yoksa, ekle
+            if (!dbUser) {
+              const newUser = await db
+                .insert(users)
+                .values({
+                  email,
+                  name: profile?.name as string,
+                  image: profile?.picture as string,
+                  googleId: profile?.sub as string,
+                  isUserVerified: true, // Google ile girişte verified sayabilirsin
+                  // Diğer alanlar default kalabilir
+                })
+                .returning();
+              dbUser = newUser[0];
+            }
+            // Token'a user id ekle
+            token.id = dbUser.id;
+          }
+          // Credentials ile girişte mevcut kodun çalışmaya devam etsin
           if (user) {
             token.id = user.id;
           }
@@ -20,6 +46,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         },
       },
     providers: [
+        GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET
+          }),
         Credentials({
             credentials: {
                 email: {},

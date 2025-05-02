@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Mail } from "lucide-react";
+import { signIn } from "next-auth/react";
 
 function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -19,13 +20,17 @@ interface AuthOptionsProps {
 export default function AuthOptions({ onEmail }: AuthOptionsProps) {
   return (
     <div className="flex flex-col gap-4 w-full max-w-xs mx-auto">
-      <Button variant="outline" className="flex items-center gap-2 justify-center">
+      <Button
+        variant="outline"
+        className="flex items-center gap-2 justify-center"
+        onClick={() => signIn("google")} // <-- EKLE
+      >
         <GoogleIcon />
         <span>Continue with Google</span>
       </Button>
       <div className="flex items-center gap-2">
         <div className="flex-1 h-px bg-muted" />
-        <span className="text-xs text-muted-foreground">veya</span>
+        <span className="text-xs text-muted-foreground">or</span>
         <div className="flex-1 h-px bg-muted" />
       </div>
       <Button variant="default" className="flex items-center gap-2 justify-center" onClick={onEmail}>
