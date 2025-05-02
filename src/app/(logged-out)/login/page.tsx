@@ -27,6 +27,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
 import AuthOptions from "../auth-options";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -124,7 +125,19 @@ export default function Login() {
                           type="button"
                           variant="outline"
                           className="mt-2"
-                          onClick={() => resendVerificationEmail(form.getValues("email"))}
+                          onClick={async () => {
+                            const result = await resendVerificationEmail(form.getValues("email"));
+                            toast(result.message, {
+                              classNames: {
+                                toast: result.success
+                                  ? "toast !bg-green-500 !text-white"
+                                  : "toast !bg-red-500 !text-white",
+                                description: result.success
+                                  ? "description !bg-green-500 !text-white"
+                                  : "description !bg-red-500 !text-white",
+                              },
+                            });
+                          }}
                         >
                           Resend verification email
                         </Button>
